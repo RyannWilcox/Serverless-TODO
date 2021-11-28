@@ -4,14 +4,13 @@ import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { createTodo } from '../../helpers/todos'
+import { getUserId } from '../utils'
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body)
-    const auth = event.headers.Authorization
-    const split = auth.split(' ')
-    const jwtToken = split[1]
-    const item = await createTodo(newTodo,jwtToken)
+    const userId = getUserId(event)
+    const item = await createTodo(newTodo,userId)
 
     return {
       statusCode: 201,

@@ -13,7 +13,7 @@ const logger = createLogger('TodosAccess')
 
 export class TodosAccess{
 
-  constructor(
+  constructor (
     private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
     private readonly todosTable = process.env.TODOS_TABLE,
     private readonly userIndex = process.env.USER_ID_INDEX){}
@@ -31,12 +31,25 @@ export class TodosAccess{
     }).promise()
 
     const items = result.Items
+    logger.info('All TODOs', items)
 
     return items as TodoItem[]
   }
 
+  async getTodo(todoId: string): Promise<TodoItem> {
+
+    const result = await this.docClient.get({
+      TableName: this.todosTable,
+      Key: {
+        todoId
+      }
+    }).promise()
+
+    return result.Item as TodoItem
+  }
+
   async createTodo(todoItem: TodoItem): Promise<TodoItem> {
-    logger.info('creating todo', todoItem)
+    logger.info('creating TODO', todoItem)
 
     await this.docClient.put({
       TableName: this.todosTable,
@@ -44,5 +57,19 @@ export class TodosAccess{
     }).promise()
 
     return todoItem
+  }
+
+  async updateTodoWithURL(todoItem: TodoItem, attachmentUrl: string){
+
+    await this.docClient.update({
+      TableName: this.todosTable,
+      Key: {
+        todoId: todoItem.todoId
+      },
+      UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+      ExpressionAttributeValues: {
+        ':attachmentUrl': attachmentUrl
+      }
+    }).promise()
   }
 }
