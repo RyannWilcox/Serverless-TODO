@@ -2,10 +2,10 @@ import { TodosAccess } from './todosAccess'
 import { AttachmentUtils } from './attachmentUtils';
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-//import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import * as uuid from 'uuid'
-//import * as createError from 'http-errors'
+import { TodoUpdate } from '../models/TodoUpdate';
 
 const logger = createLogger('todos')
 
@@ -32,6 +32,14 @@ export async function createTodo (createRequest: CreateTodoRequest, userId: stri
   })
 }
 
+export async function getTodo(todoId: string): Promise<TodoItem> {
+  return await todosAccess.getTodo(todoId)
+}
+
+export async function updateTodo(updateRequest: UpdateTodoRequest, todoId: string){
+  todosAccess.updateTodo(todoId,updateRequest as TodoUpdate)
+}
+
 export async function createAttachmentPresignedUrl (todoId: string): Promise<string> {
   const url = await attachmentUtil.getUploadUrl(todoId)
   logger.info('creating presigned url for -> ' + todoId)
@@ -43,6 +51,6 @@ export async function updateAttachmentUrl(todoId: string) {
   const attachUrl = await attachmentUtil.getAttachmentUrl(todoId)
 
   await todosAccess.updateTodoWithURL(todoItem,attachUrl)
-  
+
   return attachUrl
 }

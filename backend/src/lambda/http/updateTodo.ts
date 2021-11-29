@@ -3,20 +3,44 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
-
-import { updateTodo } from '../../businessLogic/todos'
+import { updateTodo, getTodo} from '../../helpers/todos'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { getUserId } from '../utils'
+import {createLogger} from '../../utils/logger'
+
+const logger = createLogger('updateTodo')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    logger.info('Attempting to update TODO', event)
     const todoId = event.pathParameters.todoId
+    const userId = getUserId(event)
+    const todo = await getTodo(todoId)
+
+    if(!todo){
+      logger.warn('TODO was not found for ' + userId)
+      return {
+        statusCode: 404,
+        body: 'TODO was not found'
+      }
+    }
+
+    if(todo.userId !== userId){
+      logger.warn(`${userId} Not authorized to update TODO`)
+      return {
+        statusCode:403,
+        body: 'User is not authorized to update item'
+      }
+    }
+
     const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-    // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
+    await updateTodo(updatedTodo,todoId)
 
-
-    return undefined
-)
+    return {
+      statusCode: 200,
+      body: ''
+    }
+  })
 
 handler
   .use(httpErrorHandler())

@@ -3,13 +3,10 @@ import * as AWSXRay from 'aws-xray-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
-//import { TodoUpdate } from '../models/TodoUpdate';
+import { TodoUpdate } from '../models/TodoUpdate';
 
 const XAWS = AWSXRay.captureAWS(AWS)
-
 const logger = createLogger('TodosAccess')
-
-// TODO: Implement the dataLayer logic
 
 export class TodosAccess{
 
@@ -58,6 +55,23 @@ export class TodosAccess{
 
     return todoItem
   }
+
+  async updateTodo(todoId: string, todoUpdate: TodoUpdate){
+    await this.docClient.update({
+      TableName: this.todosTable,
+      Key: {
+        todoId: todoId
+      },
+      ExpressionAttributeNames: {"#N": "name"},
+      UpdateExpression:'set #N = :name, dueDate = :dueDate, done = :done',
+      ExpressionAttributeValues:{
+        ":name": todoUpdate.name,
+        ":dueDate": todoUpdate.dueDate,
+        ":done": todoUpdate.done
+      }
+    }).promise()
+  }
+  
 
   async updateTodoWithURL(todoItem: TodoItem, attachmentUrl: string){
 
