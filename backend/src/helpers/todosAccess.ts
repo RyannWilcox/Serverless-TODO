@@ -86,4 +86,14 @@ export class TodosAccess{
       }
     }).promise()
   }
+
+  async deleteTodo(todoId: string){
+    logger.info('Deleting TODO item for TODO Id -> ' + todoId)
+    await this.docClient.delete({
+      TableName: this.todosTable,
+      Key: {
+        todoId: todoId
+      }
+    }).promise()
+  }
 }

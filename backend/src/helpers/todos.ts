@@ -54,3 +54,8 @@ export async function updateAttachmentUrl(todoId: string) {
 
   return attachUrl
 }
+
+export async function deleteTodo(todoId: string){
+  logger.info('deleting TODO for TODO id -> ' + todoId)
+  await todosAccess.deleteTodo(todoId)
+}

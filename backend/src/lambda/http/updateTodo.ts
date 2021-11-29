@@ -26,7 +26,7 @@ export const handler = middy(
     }
 
     if(todo.userId !== userId){
-      logger.warn(`${userId} Not authorized to update TODO`)
+      logger.warn(`${userId} not authorized to update TODO`)
       return {
         statusCode:403,
         body: 'User is not authorized to update item'
