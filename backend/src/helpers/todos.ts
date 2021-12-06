@@ -32,12 +32,12 @@ export async function createTodo (createRequest: CreateTodoRequest, userId: stri
   })
 }
 
-export async function getTodo(todoId: string): Promise<TodoItem> {
-  return await todosAccess.getTodo(todoId)
+export async function getTodo(todoId: string,userId: string): Promise<TodoItem> {
+  return await todosAccess.getTodo(todoId,userId)
 }
 
-export async function updateTodo(updateRequest: UpdateTodoRequest, todoId: string){
-  todosAccess.updateTodo(todoId,updateRequest as TodoUpdate)
+export async function updateTodo(updateRequest: UpdateTodoRequest, todoId: string,userId: string){
+  todosAccess.updateTodo(todoId,updateRequest as TodoUpdate,userId)
 }
 
 export async function createAttachmentPresignedUrl (todoId: string): Promise<string> {
@@ -46,8 +46,8 @@ export async function createAttachmentPresignedUrl (todoId: string): Promise<str
   return url
 }
 
-export async function updateAttachmentUrl(todoId: string) {
-  const todoItem = await todosAccess.getTodo(todoId)
+export async function updateAttachmentUrl(todoId: string,userId: string) {
+  const todoItem = await todosAccess.getTodo(todoId,userId)
   const attachUrl = await attachmentUtil.getAttachmentUrl(todoId)
 
   await todosAccess.updateTodoWithURL(todoItem,attachUrl)
@@ -55,7 +55,7 @@ export async function updateAttachmentUrl(todoId: string) {
   return attachUrl
 }
 
-export async function deleteTodo(todoId: string){
-  logger.info('deleting TODO for TODO id -> ' + todoId)
-  await todosAccess.deleteTodo(todoId)
+export async function deleteTodo(todoId: string, userId: string){
+  logger.info('deleting TODO for user id -> ' + todoId)
+  await todosAccess.deleteTodo(todoId,userId)
 }

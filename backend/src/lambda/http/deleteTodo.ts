@@ -14,7 +14,7 @@ export const handler = middy(
     logger.info('Attempting to delete TODO', event)
     const todoId = event.pathParameters.todoId
     const userId = getUserId(event)
-    const todo = await getTodo(todoId)
+    const todo = await getTodo(todoId,userId)
 
     if(!todo){
       logger.warn('TODO was not found for ' + userId)
@@ -32,7 +32,7 @@ export const handler = middy(
       }
     }
 
-    await deleteTodo(todoId)
+    await deleteTodo(todoId,userId)
     
     return {
       statusCode: 204,

@@ -15,7 +15,7 @@ export const handler = middy(
     logger.info('Attempting to update TODO', event)
     const todoId = event.pathParameters.todoId
     const userId = getUserId(event)
-    const todo = await getTodo(todoId)
+    const todo = await getTodo(todoId,userId)
 
     if(!todo){
       logger.warn('TODO was not found for ' + userId)
@@ -24,7 +24,7 @@ export const handler = middy(
         body: 'TODO was not found'
       }
     }
-
+    
     if(todo.userId !== userId){
       logger.warn(`${userId} not authorized to update TODO`)
       return {
@@ -34,7 +34,7 @@ export const handler = middy(
     }
 
     const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-    await updateTodo(updatedTodo,todoId)
+    await updateTodo(updatedTodo,todoId,userId)
 
     return {
       statusCode: 200,

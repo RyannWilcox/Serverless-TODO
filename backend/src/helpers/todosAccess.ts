@@ -33,12 +33,13 @@ export class TodosAccess{
     return items as TodoItem[]
   }
 
-  async getTodo(todoId: string): Promise<TodoItem> {
+  async getTodo(todoId: string,userId: string): Promise<TodoItem> {
 
     const result = await this.docClient.get({
       TableName: this.todosTable,
       Key: {
-        todoId
+        userId: userId,
+        todoId: todoId
       }
     }).promise()
 
@@ -56,10 +57,11 @@ export class TodosAccess{
     return todoItem
   }
 
-  async updateTodo(todoId: string, todoUpdate: TodoUpdate){
+  async updateTodo(todoId: string, todoUpdate: TodoUpdate,userId: string){
     await this.docClient.update({
       TableName: this.todosTable,
       Key: {
+        userId: userId,
         todoId: todoId
       },
       ExpressionAttributeNames: {"#N": "name"},
@@ -78,6 +80,7 @@ export class TodosAccess{
     await this.docClient.update({
       TableName: this.todosTable,
       Key: {
+        userId: todoItem.userId,
         todoId: todoItem.todoId
       },
       UpdateExpression: 'set attachmentUrl = :attachmentUrl',
@@ -87,11 +90,12 @@ export class TodosAccess{
     }).promise()
   }
 
-  async deleteTodo(todoId: string){
-    logger.info('Deleting TODO item for TODO Id -> ' + todoId)
+  async deleteTodo(todoId: string,userId: string){
+    logger.info('Deleting TODO item for TODO Id -> ' + userId)
     await this.docClient.delete({
       TableName: this.todosTable,
       Key: {
+        userId: userId,
         todoId: todoId
       }
     }).promise()
