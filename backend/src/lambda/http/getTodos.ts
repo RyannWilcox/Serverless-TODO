@@ -9,11 +9,16 @@ import { getUserId } from '../utils'
 const logger = createLogger('getTodos')
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    // Write your code here
-    logger.info('Getting todos')
-    
+    logger.info('Getting TODOs',event)   
     const userId = getUserId(event)
     
+    if(!userId){
+      return {
+        statusCode: 404,
+        body: "Unable to find the provided user id"
+      }
+    }
+
     const items = await getTodosForUser(userId)
 
     return {

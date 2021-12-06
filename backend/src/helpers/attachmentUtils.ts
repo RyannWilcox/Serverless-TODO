@@ -11,6 +11,7 @@ export class AttachmentUtils {
     private readonly bucket = process.env.ATTACHMENT_S3_BUCKET){}
 
     async getUploadUrl(todoId: string) : Promise<string>{
+      logger.info('Generating upload url for TODO id ' + todoId)
       return this.s3.getSignedUrl('putObject',{
         Bucket: this.bucket,
         Key: todoId,
